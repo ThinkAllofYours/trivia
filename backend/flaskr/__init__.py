@@ -29,8 +29,8 @@ def create_app(test_config=None):
         response.headers.add("Access-Control-Allow-Methods", "GET, POST, DELETE")
         return response
 
-
     from .views import question_views, form_views, quiz_views
+
     app.register_blueprint(question_views.bp)
     app.register_blueprint(form_views.bp)
     app.register_blueprint(quiz_views.bp)
@@ -40,5 +40,16 @@ def create_app(test_config=None):
     Create error handlers for all expected errors
     including 404 and 422.
     """
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({"success": False, "error": 404, "message": "not found"}), 404
+
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return (
+            jsonify({"success": False, "error": 422, "message": "Can not process the request"}),
+            422,
+        )
 
     return app

@@ -20,6 +20,7 @@ ten questions per page and pagination at the bottom of the screen for three page
 Clicking on the page numbers should update the questions.
 """
 
+
 @bp.route("/questions", methods=["GET"])
 def get_questions():
     page = request.args.get("page", 1, type=int)
@@ -40,6 +41,44 @@ def get_questions():
             "current_category": current_category,
         }
     )
+
+
+"""
+@TODO:
+Create an endpoint to POST a new question,
+which will require the question and answer text,
+category, and difficulty score.
+
+TEST: When you submit a question on the "Add" tab,
+the form will clear and the question will appear at the end of the last page
+of the questions list in the "List" tab.
+"""
+
+
+@bp.route("/questions", methods=["POST"])
+def create_question():
+    body = request.get_json()
+
+    new_question = body.get("question", None)
+    new_answer = body.get("answer", None)
+    category_id = body.get("category", None)
+    difficulty = body.get("difficulty", None)
+
+    if not new_question or not new_answer or not category_id or not difficulty:
+        abort(400)
+
+    try:
+        new_item = Question(
+            question=new_question,
+            answer=new_answer,
+            category=category_id,
+            difficulty=difficulty,
+        )
+        new_item.insert()
+
+        return jsonify({"success": True, "created": new_item.id})
+    except:
+        abort(422)
 
 
 """
