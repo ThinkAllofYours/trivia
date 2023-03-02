@@ -63,6 +63,30 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
 
+    def test_delete_question(self):
+        res = self.client.post(
+            "/questions",
+            json={
+                "question": "What is the capital of Korea?",
+                "answer": "Seoul",
+                "difficulty": 1,
+                "category": 3,
+            },
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertTrue(data.get("question_id"))
+
+        question_id = data.get("question_id")
+        res = self.client.delete(f"/questions/{question_id}")
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+
+
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()

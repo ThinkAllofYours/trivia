@@ -76,7 +76,7 @@ def create_question():
         )
         new_item.insert()
 
-        return jsonify({"success": True, "created": new_item.id})
+        return jsonify({"success": True, "question_id": new_item.id})
     except:
         abort(422)
 
@@ -88,6 +88,19 @@ Create an endpoint to DELETE question using a question ID.
 TEST: When you click the trash icon next to a question, the question will be removed.
 This removal will persist in the database and when you refresh the page.
 """
+
+
+@bp.route("/questions/<int:question_id>", methods=["DELETE"])
+def delete_question(question_id):
+    stmt = select(Question).where(Question.id == question_id)
+    question = session.scalars(stmt).one()
+    if question is None:
+        abort(404)
+    try:
+        question.delete()
+        return jsonify({"success": True})
+    except:
+        abort(422)
 
 
 """
@@ -102,6 +115,31 @@ Try using the word "title" to start.
 """
 
 
+@bp.route("/questions/search", methods=["POST"])
+def search_questions():
+    body = request.get_json()
+    search_term = body.get("searchTerm", None)
+
+    if search_term is not None:
+        stmt = select(Question).where(Question.question.ilike(f"%{search_term}%"))
+        questions = session.scalars(stmt).all()
+    else:
+        questions = session.query(Question).all()
+
+    if len(questions) == 0:
+        abort(404)
+
+    formatted_questions = [question.format() for question in questions]
+    return jsonify(
+        {
+            "success": True,
+            "questions": formatted_questions,
+            "total_questions": len(formatted_questions),
+            "current_category": None,
+        }
+    )
+
+
 """
 @TODO:
 Create a GET endpoint to get questions based on category.
@@ -110,3 +148,19 @@ TEST: In the "List" tab / main screen, clicking on one of the
 categories in the left column will cause only questions of that
 category to be shown.
 """
+
+@bp.route("/categories/<int:category_id>/questions", methods=["GET"])
+def get_questions_by_category(category_id):
+    stmt = select(Question).where(Question.category == category_id)
+    questions = session.scalars(stmt).all()
+    if len(questions) == 0:
+        abort(404)
+    formatted_questions = [question.format() for question in questions]
+    return jsonify(
+        {
+            "success": True,
+            "questions": formatted_questions,
+            "total_questions": len(formatted_questions),
+            "current_category": category_id,
+        }
+    )
