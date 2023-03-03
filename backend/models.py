@@ -26,13 +26,34 @@ def setup_db(app, test_config=None):
         db.create_all()
 
 
+class BaseModel(db.Model):
+    __abstract__ = True
+
+    def __init__(self):
+        pass
+
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def format(self):
+        raise NotImplementedError
+
+
 """
 Question
 
 """
 
 
-class Question(db.Model):
+class Question(BaseModel):
     __tablename__ = "questions"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -47,17 +68,6 @@ class Question(db.Model):
         self.answer = answer
         self.category = category
         self.difficulty = difficulty
-
-    def insert(self):
-        db.session.add(self)
-        db.session.commit()
-
-    def update(self):
-        db.session.commit()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
 
     def format(self):
         return {
@@ -75,7 +85,7 @@ Category
 """
 
 
-class Category(db.Model):
+class Category(BaseModel):
     __tablename__ = "categories"
 
     id = db.Column(db.Integer, primary_key=True)
