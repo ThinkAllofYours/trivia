@@ -1,6 +1,8 @@
-from flask import Flask, request, abort, jsonify
+import os
+from flask import Flask, jsonify
 from flask_cors import CORS
 from models import setup_db
+from config import app_config
 
 QUESTIONS_PER_PAGE = 10
 
@@ -8,6 +10,11 @@ QUESTIONS_PER_PAGE = 10
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
+    env = os.environ.get("FLASK_ENV")
+    if env == "development":
+        app.config.from_object(app_config["development"])
+    else:
+        app.config.from_object('config')
     setup_db(app, test_config)
 
     """

@@ -4,9 +4,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import json
 
-database_name = "trivia"
-database_path = "postgresql://{}/{}".format("localhost:5432", database_name)
-
 db = SQLAlchemy()
 migrate = Migrate()
 
@@ -17,9 +14,6 @@ setup_db(app)
 
 
 def setup_db(app, test_config=None):
-    db_path = test_config if test_config else database_path
-    app.config["SQLALCHEMY_DATABASE_URI"] = db_path
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     with app.app_context():
         db.init_app(app)
         migrate.init_app(app, db)
