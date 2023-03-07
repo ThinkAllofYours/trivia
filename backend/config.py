@@ -16,15 +16,14 @@ class DevelopmentConfig(Config):
     database_path = "postgresql://{}/{}".format("localhost:5432", database_name)
     SQLALCHEMY_DATABASE_URI = database_path
 
+
 class TestingConfig(Config):
     TESTING = True
     database_name = "trivia_test"
     database_path = "postgresql://{}/{}".format("localhost:5432", database_name)
     SQLALCHEMY_DATABASE_URI = database_path
 
-app_config = {
-    "development": DevelopmentConfig,
-    "testing": TestingConfig
-}
 
-FLASK_DEBUG = os.environ.get('FLASK_DEBUG', False)
+app_config = {"development": DevelopmentConfig, "testing": TestingConfig}
+
+FLASK_DEBUG = os.environ.get("FLASK_DEBUG", False)

@@ -19,6 +19,3 @@ def get_categories():
     categories = session.query(Category).all()
     formatted_categories = {category.id: category.type for category in categories}
     return jsonify({"success": True, "categories": formatted_categories})
-
-
-

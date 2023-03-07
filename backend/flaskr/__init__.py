@@ -14,7 +14,7 @@ def create_app(test_config=None):
     if env == "development":
         app.config.from_object(app_config["development"])
     else:
-        app.config.from_object('config')
+        app.config.from_object("config")
     setup_db(app, test_config)
 
     """
@@ -28,7 +28,9 @@ def create_app(test_config=None):
 
     @app.after_request
     def after_request(response):
-        response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        response.headers.add(
+            "Access-Control-Allow-Headers", "Content-Type, Authorization"
+        )
         response.headers.add("Access-Control-Allow-Methods", "GET, POST, DELETE")
         return response
 
@@ -44,15 +46,34 @@ def create_app(test_config=None):
     including 404 and 422.
     """
 
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({"success": False, "error": 400, "message": "Bad request"}), 400
+
     @app.errorhandler(404)
     def not_found(error):
-        return jsonify({"success": False, "error": 404, "message": "not found"}), 404
+        return jsonify({"success": False, "error": 404, "message": "Not found"}), 404
 
     @app.errorhandler(422)
     def unprocessable(error):
         return (
-            jsonify({"success": False, "error": 422, "message": "Can not process the request"}),
+            jsonify(
+                {
+                    "success": False,
+                    "error": 422,
+                    "message": "Can not process the request",
+                }
+            ),
             422,
+        )
+
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        return (
+            jsonify(
+                {"success": False, "error": 500, "message": "Internal server error"}
+            ),
+            500,
         )
 
     return app

@@ -1,6 +1,7 @@
 from flaskr import create_app
 from models import Question, Category
 
+
 def setUp():
     """Define test variables and initialize app."""
     database_name = "trivia_test"
@@ -9,7 +10,7 @@ def setUp():
     client = app.test_client()
     with app.app_context():
         # delete test categories
-        items = Category.query.filter(Category.type.ilike('%Test%')).all()
+        items = Category.query.filter(Category.type.ilike("%Test%")).all()
         for item in items:
             item.delete()
 
@@ -17,7 +18,7 @@ def setUp():
         # print categories
         items = Category.query.all()
         for item in items:
-            print(f'Category: {item.id} {item.type}')
+            print(f"Category: {item.id} {item.type}")
+
 
 setUp()
-

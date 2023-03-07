@@ -149,6 +149,7 @@ categories in the left column will cause only questions of that
 category to be shown.
 """
 
+
 @bp.route("/categories/<int:category_id>/questions", methods=["GET"])
 def get_questions_by_category(category_id):
     stmt = select(Question).where(Question.category == category_id)
