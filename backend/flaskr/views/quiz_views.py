@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, abort, jsonify, request
 from models import Question, db
 from flask import jsonify
 from sqlalchemy import select
@@ -26,6 +26,9 @@ def play_quiz():
     previous_questions = body.get("previous_questions", [])
     quiz_category = body.get("quiz_category", None)
 
+    if previous_questions is None or quiz_category is None:
+        abort(422)
+
     if quiz_category and quiz_category["id"]:
         stmt = (
             select(Question)
@@ -36,7 +39,7 @@ def play_quiz():
         stmt = select(Question).where(Question.id.notin_(previous_questions))
 
     questions = session.scalars(stmt).all()
-    if questions is not None:
+    if len(questions) > 0:
         question = random.choice(questions)
         response = jsonify({"success": True, "question": question.format()})
     else:

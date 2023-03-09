@@ -32,6 +32,10 @@ def get_questions():
     formatted_categories = {category.id: category.type for category in categories}
     current_category = None
     total_questions = len(formatted_questions)
+
+    if start >= total_questions:
+        abort(404)
+
     return jsonify(
         {
             "success": True,
@@ -64,7 +68,17 @@ def create_question():
     category_id = body.get("category", None)
     difficulty = body.get("difficulty", None)
 
-    if not new_question or not new_answer or not category_id or not difficulty:
+    stmt = select(Category).where(Category.id == category_id)
+    category = session.scalars(stmt).all()
+
+    if (
+        not new_question
+        or not new_answer
+        or not category_id
+        or not difficulty
+        or (difficulty < 1 or difficulty > 5)
+        or not (len(category) > 0)
+    ):
         abort(400)
 
     try:
@@ -93,9 +107,9 @@ This removal will persist in the database and when you refresh the page.
 @bp.route("/questions/<int:question_id>", methods=["DELETE"])
 def delete_question(question_id):
     stmt = select(Question).where(Question.id == question_id)
-    question = session.scalars(stmt).one()
+    question = session.scalars(stmt).first()
     if question is None:
-        abort(404)
+        abort(400)
     try:
         question.delete()
         return jsonify({"success": True})
@@ -119,6 +133,9 @@ Try using the word "title" to start.
 def search_questions():
     body = request.get_json()
     search_term = body.get("searchTerm", None)
+
+    if search_term is None:
+        abort(400)
 
     if search_term is not None:
         stmt = select(Question).where(Question.question.ilike(f"%{search_term}%"))

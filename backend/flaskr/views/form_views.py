@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, abort
 from models import Category, Question, db
 from flask import jsonify
 from sqlalchemy import select
@@ -16,6 +16,11 @@ for all available categories.
 
 @bp.route("/categories", methods=["GET"])
 def get_categories():
-    categories = session.query(Category).all()
-    formatted_categories = {category.id: category.type for category in categories}
-    return jsonify({"success": True, "categories": formatted_categories})
+    try:
+        categories = session.query(Category).all()
+        formatted_categories = {category.id: category.type for category in categories}
+        return jsonify({"success": True, "categories": formatted_categories})
+    except:
+        abort(500)
+
+
